@@ -17,8 +17,7 @@ titanic.head()
 #########################################
 # Görev 2: Yukarıda tanımlanan Titanic veri setindeki kadın ve erkek yolcuların sayısını bulunuz.
 #########################################
-gender = titanic['sex'].value_counts()
-gender
+titanic['sex'].value_counts()
 #########################################
 # Görev 3: Her bir sutuna ait unique değerlerin sayısını bulunuz.
 #########################################
