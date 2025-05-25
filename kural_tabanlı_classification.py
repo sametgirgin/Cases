@@ -55,4 +55,95 @@ avg_price_country_source = persona_df.groupby(["COUNTRY", "SOURCE"])["PRICE"].me
 avg_price_country_source
 
                                         ## Görev 2
+# COUNTRY, SOURCE, SEX, AGE kırılımında ortalama kazançlar nedir?
 
+#avg_price_detailed = persona_df.groupby(["COUNTRY", "SOURCE", "SEX", "AGE"])["PRICE"].mean().reset_index()
+
+pivot_df = persona_df.groupby(["COUNTRY", "SOURCE", "SEX", "AGE"])["PRICE"].mean().to_frame(name="PRICE")
+pivot_df
+                                        ## Görev 3
+# Çıktıyı PRICE’a göre sıralayınız.
+
+agg_df = pivot_df.sort_values(by="PRICE", ascending=False)
+agg_df
+                                        ## Görev 4
+#Indekste yer alan isimleri değişken ismine çeviriniz.
+agg_df = agg_df.reset_index()
+agg_df
+
+                                        ## Görev 5
+#Age değişkenini kategorik değişkene çeviriniz ve agg_df’e ekleyiniz.
+bins = [0, 18, 23, 30, 40, agg_df["AGE"].max()]
+labels = ["0_18", "19_23", "24_30", "31_40", "41_70"]
+
+agg_df["AGE_CAT"] = pd.cut(agg_df["AGE"], bins=bins, labels=labels, right=False)
+agg_df
+
+                                        ## Görev 6
+#Yeni seviye tabanlı müşterileri (persona) tanımlayınız.
+
+# customers_level_based sütunu oluşturma
+agg_df["customers_level_based"] = [
+    f"{row['COUNTRY'].upper()}_{row['SOURCE'].upper()}_{row['SEX'].upper()}_{row['AGE_CAT']}"
+    for _, row in agg_df.iterrows()
+]
+#Bu kısım, agg_df DataFrame'ini customers_level_based sütunundaki benzersiz değerlere göre
+# gruplar. as_index=False parametresi sayesinde, gruplama sonucu oluşturulan DataFrame'in
+# gruplama sütunu indeks olarak kullanılmaz, bunun yerine normal bir sütun olarak kalır.
+
+agg_df_unique = agg_df.groupby("customers_level_based", as_index=False)["PRICE"].mean().sort_values(by="PRICE", ascending=False).reset_index(drop=True)
+agg_df_unique
+
+                                            ## Görev 7
+#Yeni müşterileri (personaları) segmentlere ayırınız.
+agg_df_unique["SEGMENT"] = pd.qcut(agg_df_unique["PRICE"], 4, labels=["D", "C", "B", "A"])
+agg_df_unique
+
+segment_summary = agg_df_unique.groupby("SEGMENT",observed=True).agg({"PRICE": ["mean", "max", "sum"]}).round(2)
+segment_summary
+
+                                            ## Görev 8
+new_persona = "FRA_IOS_FEMALE_31_40"
+#new_persona = "TUR_ANDROID_FEMALE_31_40"
+agg_df_unique[agg_df_unique["customers_level_based"]== new_persona].assign(PRICE=lambda x: x["PRICE"].round(2))
+
+
+#Bir fonksiyon yardımıyla
+def predict_customer_segment(country, source, sex, age, agg_df_unique):
+    # Yaş kategorisini belirle
+    if age < 18:
+        age_cat = "0_18"
+    elif age < 23:
+        age_cat = "19_23"
+    elif age < 30:
+        age_cat = "24_30"
+    elif age < 40:
+        age_cat = "31_40"
+    else:
+        age_cat = "41_70"
+
+    # Persona'yı oluştur
+    persona = f"{country.upper()}_{source.upper()}_{sex.upper()}_{age_cat}"
+
+    # Persona'yı agg_df_unique içinde ara
+    match = agg_df_unique[agg_df_unique["customers_level_based"] == persona]
+
+    # Sonuç varsa döndür
+    if not match.empty:
+        segment = match["SEGMENT"].values[0]
+        price = float(match["PRICE"].values[0])  # float64 yerine float dönüşümü
+        return {
+            "persona": persona,
+            "segment": segment,
+            "expected_revenue": round(price, 2)
+        }
+    else:
+        return {
+            "persona": persona,
+            "segment": "Not found",
+            "expected_revenue": None
+        }
+
+result = predict_customer_segment("fra", "ios", "female", 35, agg_df_unique)
+
+result
