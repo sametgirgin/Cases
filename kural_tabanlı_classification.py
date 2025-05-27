@@ -19,7 +19,7 @@ persona_df = pd.read_csv("persona.csv")
 persona_df.head()
 persona_df.describe()
 persona_df.info()
-
+persona_df.shape[0]
 # Soru 2: Kaç unique SOURCE vardır? Frekansları nedir?
 persona_df['SOURCE'].unique()
 persona_df['SOURCE'].nunique()
@@ -91,8 +91,16 @@ agg_df["customers_level_based"] = [
 # gruplar. as_index=False parametresi sayesinde, gruplama sonucu oluşturulan DataFrame'in
 # gruplama sütunu indeks olarak kullanılmaz, bunun yerine normal bir sütun olarak kalır.
 
-agg_df_unique = agg_df.groupby("customers_level_based", as_index=False)["PRICE"].mean().sort_values(by="PRICE", ascending=False).reset_index(drop=True)
-agg_df_unique
+agg_df_unique = agg_df.groupby("customers_level_based", as_index=False).agg({
+    "COUNTRY": "first",  # Take the first value for 'COUNTRY'
+    "SOURCE": "first",   # Take the first value for 'SOURCE'
+    "SEX": "first",      # Take the first value for 'SEX'
+    "PRICE": "mean",     # Calculate the mean for 'PRICE'
+    "AGE_CAT": "first"   # Take the first value for 'AGE_CAT'
+})
+
+#agg_df_unique = agg_df.groupby("customers_level_based", as_index=False)["PRICE"].mean().sort_values(by="PRICE", ascending=False).reset_index(drop=True)
+#agg_df_unique
 
                                             ## Görev 7
 #Yeni müşterileri (personaları) segmentlere ayırınız.
@@ -146,4 +154,23 @@ def predict_customer_segment(country, source, sex, age, agg_df_unique):
 
 result = predict_customer_segment("fra", "ios", "female", 35, agg_df_unique)
 
-result
+# 3. metod
+def gelir(agg_df_unique, country, source, sex, age_cat):
+    filters = {"COUNTRY": country, "SOURCE": source, "SEX": sex, "AGE_CAT": age_cat}
+
+    for key, value in filters.items():
+        agg_df_unique = agg_df_unique[agg_df_unique[key] == value] if value else agg_df_unique
+    return agg_df_unique["PRICE"].mean()
+
+# gelir fonksiyonunu çağır
+gelir(agg_df_unique, country="tur", source="android", sex="female", age_cat="31_40")
+
+
+# agg_df columns kontrol et
+print(agg_df_unique.columns)
+
+#Son eklemeler yapıldı.
+
+
+
+

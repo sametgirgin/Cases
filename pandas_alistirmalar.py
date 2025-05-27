@@ -73,8 +73,8 @@ titanic.isnull().sum()
 #########################################
 # Görev 12: who değişkenini dataframe'den düşürün.
 #########################################
-titanic.drop(columns=['who'])
-
+titanic.drop(columns=['who'], axis=1, inplace=True)
+titanic.head()
 #########################################
 # Görev 13: deck değikenindeki boş değerleri deck değişkenin en çok tekrar eden değeri (mode)
 # ile doldurunuz.
@@ -146,7 +146,7 @@ print(results_time_day)
 # day'e göre toplamını, min, max ve ortalamasını bulunuz.
 #########################################
 
-filtered_lunch_female = tips[(tips['time'] == 'Lunch') & (tips['sex'] == 'Female')]
+filtered_lunch_female = tips[(tips['time'] == 'Lunch') & (tips['sex'] == 'Female')].groupby('day')[['total_bill', 'tip']].agg(['sum', 'min', 'max', 'mean'])    
 
 results_lunch_female = filtered_lunch_female.groupby('day')[['total_bill', 'tip']].agg(['sum', 'min', 'max', 'mean'])
 
@@ -176,5 +176,7 @@ tips.head()
 #########################################
 top_30 = tips.sort_values(by='total_bill_tip_sum', ascending=False).head(30)
 top_30
+
+#Grup çalışması yapıldı.
 
 
