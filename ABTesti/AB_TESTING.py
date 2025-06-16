@@ -98,7 +98,7 @@ merged_df = pd.concat([control_df, test_df], ignore_index=True)
 
 # Adım 1: Hipotezi tanımlayınız.
 
-    #H0: Average Bidding ve Maximum Bidding arasındaki dönüşüm oranlarında (Purchase7) anlamlı bir fark yoktur.
+    #H0: Average Bidding ve Maximum Bidding arasındaki dönüşüm oranlarında (Purchase) anlamlı bir fark yoktur.
     # 𝜇₁ = 𝜇₂ (Average Bidding purchasing ortalaması = Maximum Bidding purchasing ortalaması)
 
     #H1: Average Bidding, Maximum Bidding'e kıyasla daha fazla dönüşüm sağlar. Yani, test grubunda (Average Bidding)

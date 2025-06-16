@@ -66,14 +66,14 @@ average_ratings = amazon_df['overall'].mean()
 # Adım 2: Tarihe Göre Ağırlıklı Puan Ortalamasını Hesaplayınız.
 ###################################################
 def time_based_weighted_average(dataframe, w1=0.28, w2=0.26, w3=0.24, w4=0.22):
-    return (dataframe[dataframe["day_diff"] <= 30]["overall"].mean() * w1 +
-            dataframe[(dataframe["day_diff"] > 30) & (dataframe["day_diff"] <= 90)]["overall"].mean() * w2 +
-            dataframe[(dataframe["day_diff"] > 90) & (dataframe["day_diff"] <= 180)]["overall"].mean() * w3 +
-            dataframe[dataframe["day_diff"] > 180]["overall"].mean() * w4)
+    return (dataframe[dataframe["day_diff"] <= 250]["overall"].mean() * w1 +
+            dataframe[(dataframe["day_diff"] > 250) & (dataframe["day_diff"] <= 500)]["overall"].mean() * w2 +
+            dataframe[(dataframe["day_diff"] > 500) & (dataframe["day_diff"] <= 750)]["overall"].mean() * w3 +
+            dataframe[dataframe["day_diff"] > 750]["overall"].mean() * w4)
 
 # Ağırlıklı ortalamayı hesaplayalım
 weighted_average = time_based_weighted_average(amazon_df)
-# 4.6987161061560725
+# 4.562252826250267
 ###################################################
 # Görev 2: Ürün için Ürün Detay Sayfasında Görüntülenecek 20 Review'i Belirleyiniz.
 ###################################################
